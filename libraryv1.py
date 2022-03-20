@@ -1,3 +1,4 @@
+#from msilib import init_database
 import sqlite3
 # foo
 
@@ -62,7 +63,6 @@ cursor.execute('''INSERT INTO Subscription VALUES (4, 4, 1)   ''')
 def lookUpAlbum(n):
     global cursor
     parameter = (n, )
-    #cursor = cursor.execute("SELECT * FROM Album WHERE AlbumName = ?",parameter)
     cursor = cursor.execute("SELECT AlbumName, ArtistSurname, ArtistName "
                             "FROM Artist INNER JOIN Album on Album.ArtistID = Artist.ArtistID "
                             "WHERE AlbumName = ?;",parameter)
@@ -73,12 +73,24 @@ def lookUpAlbum(n):
         result.append(row)
     return result
 
-    
+def upateAlbum(idAl, idArt, albName):
+    global connectionHandler
+    global cursor
+    parameters = (idArt, albName, idAl)
+    cursor = cursor.execute("UPDATE ALbum "
+                             "SET ArtistID = ?,"
+                             "AlbumName = ?"
+                             "WHERE AlbumID = ?", parameters)
+    connectionHandler.commit()                   
+
+
+
 def uiManager():
     print("1. Look up details")
     print("2. Add new album")
     print("3. Add new user")
     print("4. Add new album")
+    print("5. Udate database")
     choice = input()
     if choice == "1":
         print("1. Look up album")
@@ -90,5 +102,17 @@ def uiManager():
             answer = input()
             albumName = answer.strip('\n')
             print(lookUpAlbum(albumName))
+    if choice == "5":
+        print("1. Update Album details")
+        print("2. Update Artist detail")
+        print("3. Update user detail")
+        choice = input()
+        if choice == "1":
+            print("Enter ALbumID, followed by ArtistID, followed by album name")
+            idAlb = input().strip('\n')
+            idArt = input().strip('\n')
+            albName = input().strip('\n')
+            
+            upateAlbum(idAlb, idArt, albName)
 
 uiManager()
